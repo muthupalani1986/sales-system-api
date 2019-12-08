@@ -47,7 +47,7 @@ app.use(bodyparser.urlencoded({extended:true}));
 
 app.use("/products",products);
 app.use("/orders",orders);
-app.use("/auth",users);
+app.use("/user",users);
 
 //if we are here then the specified request is not found
 app.use((req,res,next)=> {

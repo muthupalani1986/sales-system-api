@@ -23,12 +23,28 @@ router.post("/login", (req, res, next) => {
         }  
     });
 });
-router.post("/protected", passport.authenticate('jwt', { session: false }),(req, res, next) => {
-    
-    console.log(req.user);
+router.post("/add", passport.authenticate('jwt', { session: false }),(req, res, next) => {
     res.status(200).json({
-            msg:"Protected"
+            msg:"Add user"
       });
+});
+
+router.post("/delete", passport.authenticate('jwt', { session: false }),(req, res, next) => {
+  res.status(200).json({
+          msg:"Delete user"
+    });
+});
+
+router.post("/update", passport.authenticate('jwt', { session: false }),(req, res, next) => {
+  res.status(200).json({
+          msg:"Update user"
+    });
+});
+
+router.post("/:userId", passport.authenticate('jwt', { session: false }),(req, res, next) => {
+  res.status(200).json({
+          msg:"Get user"
+    });
 });
 
 module.exports = router;

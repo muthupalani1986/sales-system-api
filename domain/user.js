@@ -1,14 +1,15 @@
 class User {
     
-    constructor(name,price) {
-        this.prd_id=0;
-        this.prd_name=name;
-        this.prd_price=price;
+    constructor(name,price) {        
+        this.first_name=first_name;
+        this.last_name=last_name;
+        this.email_id=email_id;
+        this.role_id=role_id;
     }
 
-    getAddProductSQL() {
-        let sql = `INSERT INTO USERS(prd_name, prd_price) \
-                   VALUES('${this.prd_name}',${this.prd_price})`;
+    addUserSQL() {
+        let sql = `INSERT INTO users(first_name, last_name,email_id,role_id) \
+                   VALUES('${this.first_name}','${this.last_name}','${this.email_id}','${this.role_id}')`;
         return sql;           
     }
 
