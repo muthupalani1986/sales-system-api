@@ -1,15 +1,18 @@
 class User {
     
-    constructor(name,price) {        
+    constructor(first_name,last_name,email_id,password,role_id,created_at,updated_at) {        
         this.first_name=first_name;
         this.last_name=last_name;
         this.email_id=email_id;
+        this.password=password;
         this.role_id=role_id;
+        this.created_at=created_at;
+        this.updated_at=updated_at;
     }
 
     addUserSQL() {
-        let sql = `INSERT INTO users(first_name, last_name,email_id,role_id) \
-                   VALUES('${this.first_name}','${this.last_name}','${this.email_id}','${this.role_id}')`;
+        let sql = `INSERT INTO users(first_name, last_name,email_id,password,role_id,created_at,updated_at) \
+                   VALUES('${this.first_name}','${this.last_name}','${this.email_id}','${this.password}',${this.role_id},'${this.created_at}','${this.updated_at}')`;
         return sql;           
     }
 
@@ -23,13 +26,17 @@ class User {
         return sql;           
     }
 
-    static deleteProductByIdSQL(prd_id) {
-        let sql = `DELETE FROM PRODUCTS WHERE PRD_ID = ${prd_id}`;
+    static deleteUserByIdSQL(user_id) {
+        let sql = `DELETE FROM users WHERE id = ${user_id}`;
+        return sql;           
+    }
+    updateUserByIdSQL(user_id) {
+        let sql = `update users set first_name='${this.first_name}',last_name='${this.last_name}',email_id='${this.email_id}',password='${this.password}',role_id=${this.role_id},updated_at='${this.updated_at}' WHERE id = ${user_id}`;
         return sql;           
     }
 
-    static getAllProductSQL() {
-        let sql = `SELECT * FROM PRODUCTS`;
+    static getAllUserSQL() {
+        let sql = `SELECT * FROM users`;
         return sql;           
     }    
 }
