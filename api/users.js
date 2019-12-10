@@ -1,13 +1,13 @@
 import express from "express";
 import db from "../db/database";
-import User from "../domain/user";
+import User from "../queries/user";
 import config from '../configuration/config';
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 var _ = require('lodash');
 const moment = require('moment');
-
+import Util from "../common/util";
 router.post("/login", (req, res, next) => {
   const email_id = _.get(req, 'body.email_id');
   const pwd = _.get(req, 'body.password');
@@ -26,15 +26,8 @@ router.post("/login", (req, res, next) => {
   });
 });
 router.post("/new", passport.authenticate('jwt', { session: false }), (req, res, next) => {
-  const first_name = _.get(req, 'body.first_name');
-  const last_name = _.get(req, 'body.last_name');
-  const email_id = _.get(req, 'body.email_id');
-  const role_id = _.get(req, 'body.role_id');
-  const password = _.get(req, 'body.password');
-  const timeStamp = moment().format("YYYY-MM-DD HH:mm:ss");
-  const created_at = timeStamp;
-  const updated_at = timeStamp;
-  const newUser = new User(first_name, last_name, email_id, password, role_id, created_at, updated_at);
+  const userDetails=Util.getUserDetails(req);
+  const newUser = new User(userDetails.first_name, userDetails.last_name, userDetails.email_id, userDetails.password, userDetails.role_id, userDetails.created_at, userDetails.updated_at);
   db.query(newUser.addUserSQL(), (err, data) => {
     if (!err) {
       res.status(200).json({
@@ -66,15 +59,8 @@ router.post("/delete", passport.authenticate('jwt', { session: false }), (req, r
 });
 
 router.post("/update", passport.authenticate('jwt', { session: false }), (req, res, next) => {
-  const first_name = _.get(req, 'body.first_name');
-  const last_name = _.get(req, 'body.last_name');
-  const email_id = _.get(req, 'body.email_id');
-  const role_id = _.get(req, 'body.role_id');
-  const password = _.get(req, 'body.password');
-  const timeStamp = moment().format("YYYY-MM-DD HH:mm:ss");
-  const created_at = timeStamp;
-  const updated_at = timeStamp;
-  const user = new User(first_name, last_name, email_id, password, role_id, created_at, updated_at);
+  const userDetails=Util.getUserDetails(req);
+  const user = new User(userDetails.first_name, userDetails.last_name, userDetails.email_id, userDetails.password,userDetails. role_id, userDetails.created_at, userDetails.updated_at);
   const user_id = _.get(req, 'body.user_id');    
   db.query(user.updateUserByIdSQL(user_id), (err, data) => {    
     if (!err) {
@@ -86,13 +72,19 @@ router.post("/update", passport.authenticate('jwt', { session: false }), (req, r
         message: "Bad request"
       });
     }
-
   });
 });
 
-router.post("/:userId", passport.authenticate('jwt', { session: false }), (req, res, next) => {
-  res.status(200).json({
-    msg: "Get user"
+router.post("/:user_Id", passport.authenticate('jwt', { session: false }), (req, res, next) => {
+  let user_id = _.get(req, 'params.user_Id');   
+  db.query(User.getUserById(user_id), (err, data) => {    
+    if (!err) {
+      res.status(200).json(data[0]);
+    } else {
+      res.status(400).json({
+        message: "Bad request"
+      });
+    }
   });
 });
 

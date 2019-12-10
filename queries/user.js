@@ -34,7 +34,10 @@ class User {
         let sql = `update users set first_name='${this.first_name}',last_name='${this.last_name}',email_id='${this.email_id}',password='${this.password}',role_id=${this.role_id},updated_at='${this.updated_at}' WHERE id = ${user_id}`;
         return sql;           
     }
-
+    static getUserById(id) {
+        let sql = `SELECT * FROM users WHERE id = '${id}' limit 1`;
+        return sql;           
+    }
     static getAllUserSQL() {
         let sql = `SELECT * FROM users`;
         return sql;           

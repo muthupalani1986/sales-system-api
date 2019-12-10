@@ -1,6 +1,6 @@
 import express from "express";
 import db from "../db/database";
-import Product from "../domain/product";
+import Product from "../queries/product";
 const router = express.Router();
 
 router.get("/", (req, res, next) => {

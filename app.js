@@ -1,13 +1,12 @@
 import express from "express";
 import bodyparser from "body-parser";
 import cors from "cors";
-
 import products from "./api/products";
 import orders from "./api/orders";
 import users from "./api/users";
 import config from './configuration/config';
 import db from "./db/database";
-import User from "./domain/user";
+import User from "./queries/user";
 var _ = require('lodash');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
