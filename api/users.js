@@ -17,7 +17,7 @@ router.post("/login", (req, res, next) => {
     if (userDetails) {
       let payload = { email_id: userDetails.email_id, first_name: userDetails.first_name, last_name: userDetails.last_name, role_name: userDetails.role_name, role_id: userDetails.role_id };
       let token = jwt.sign(payload, config.jwtOptions.secretOrKey);
-      res.status(200).json({ msg: 'User successly authenticated', token: token });
+      res.status(200).json({ statusCode:'0000',msg: 'User successly authenticated', token: token,email_id: userDetails.email_id, first_name: userDetails.first_name, last_name: userDetails.last_name, role_name: userDetails.role_name, role_id: userDetails.role_id});
     } else {
       res.status(200).json({
         msg: "Invalid username & password"
