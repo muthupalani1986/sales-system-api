@@ -11,8 +11,14 @@ class Util {
         userDetails.email_id = _.get(req, 'body.email_id');
         userDetails.role_id = _.get(req, 'body.role_id');
         userDetails.password = _.get(req, 'body.password');
-        userDetails.created_at = userDetails.updated_at = userDetails.created_at= moment().format("YYYY-MM-DD HH:mm:ss");
+        userDetails.created_at = userDetails.updated_at = moment().format("YYYY-MM-DD HH:mm:ss");
         return userDetails;
+    }
+    static getCategoryDetails(req) {
+        const categoryDetails = {};
+        categoryDetails.category_name = _.get(req, 'body.category_name');
+        categoryDetails.created_at = categoryDetails.updated_at =  moment().format("YYYY-MM-DD HH:mm:ss");
+        return categoryDetails;
     }
 }
 export default Util;

@@ -4,6 +4,7 @@ import cors from "cors";
 import products from "./api/products";
 import orders from "./api/orders";
 import users from "./api/users";
+import category from "./api/category";
 import config from './configuration/config';
 import db from "./db/database";
 import User from "./queries/user";
@@ -46,7 +47,7 @@ app.use(bodyparser.urlencoded({extended:true}));
 app.use("/products",products);
 app.use("/orders",orders);
 app.use("/user",users);
-
+app.use("/category", category);
 //if we are here then the specified request is not found
 app.use((req,res,next)=> {
     const err = new Error("Not Found");
