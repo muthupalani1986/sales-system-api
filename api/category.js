@@ -27,9 +27,11 @@ router.post("/new", passport.authenticate('jwt', { session: false }), (req, res,
   const categoryDetails = Util.getCategoryDetails(req);
   const newCategory = new Category(categoryDetails.category_name, categoryDetails.created_at, categoryDetails.updated_at);
   db.query(newCategory.addCategorySQL(), (err, data) => {
-    if (!err) {
-      res.status(200).json({
-        message: "Category added successfully."
+    if (!err) {    
+         res.status(200).json({
+        statusCode:'0000',
+        message: "Category added successfully.",
+         id: data.insertId
       });
     } else {
       res.status(400).json({
@@ -46,6 +48,7 @@ router.post("/delete", passport.authenticate('jwt', { session: false }), (req, r
   db.query(Category.deleteCategoryByIdSQL(id), (err, data) => {    
     if (!err) {
       res.status(200).json({
+      statusCode: '0000',
         message: "Category deleted successfully."
       });
     } else {
@@ -63,6 +66,7 @@ router.post("/update", passport.authenticate('jwt', { session: false }), (req, r
   db.query(category.updateCategoryByIdSQL(id), (err, data) => {    
     if (!err) {
       res.status(200).json({
+      statusCode: '0000',
         message: "Category updated successfully."
       });
     } else {
@@ -77,7 +81,7 @@ router.post("/:id", passport.authenticate('jwt', { session: false }), (req, res,
   let id = _.get(req, 'params.id');   
   db.query(Category.getCategoryByIdSQL(id), (err, data) => {    
     if (!err) {
-      res.status(200).json(data[0]);
+    res.status(200).json({ statusCode: '0000', category: data[0]});
     } else {
       res.status(400).json({
         message: "Bad request"
