@@ -12,6 +12,7 @@ router.post("/", passport.authenticate('jwt', { session: false }), (req, res, ne
   db.query(Category.getAllCategorySQL(), (err, data) => {
     if (!err) {
       res.status(200).json({
+      statusCode: '0000',
       categories: data
       });
     } else {

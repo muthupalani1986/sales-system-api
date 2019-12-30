@@ -24,7 +24,7 @@ class Category {
         return sql;           
     }
     static getAllCategorySQL() {
-        let sql = `SELECT * FROM category`;
+        let sql = `SELECT * FROM category order by category_name asc`;
         return sql;           
     }    
 }
