@@ -46,17 +46,26 @@ router.post("/new", passport.authenticate('jwt', { session: false }), (req, res,
 
 router.post("/delete", passport.authenticate('jwt', { session: false }), (req, res, next) => {
   const id = _.get(req, 'body.id');  
-  db.query(Category.deleteCategoryByIdSQL(id), (err, data) => {    
+  db.query(Category.deleteCategoryByIdSQL(id), (err, data) => {
     if (!err) {
-      res.status(200).json({
-      statusCode: '0000',
-        message: "Category deleted successfully."
-      });
+      if (data && data.affectedRows > 0) {
+        res.status(200).json({
+          statusCode: '0000',
+          message: `Category deleted successfully.`,
+          affectedRows: data.affectedRows
+        });
+      } else {
+        res.status(200).json({
+          statusCode: '404',
+          message: "Category Not found."
+        });
+      }
     } else {
       res.status(400).json({
         message: "Bad request"
       });
-    }
+    }    
+    
   });
 });
 

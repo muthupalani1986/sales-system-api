@@ -32,11 +32,15 @@ class Product {
     }
 
     static getAllProductSQL() {
-        let sql = `SELECT * FROM products order by name asc`;
+        let sql = `SELECT prod.*,cat.category_name,saunit.name as unit_name FROM products prod INNER JOIN category cat on prod.category=cat.id INNER JOIN sales_unit saunit on prod.salesUnit=saunit.id order by prod.name asc`;
         return sql;           
     }
     static getProductCountByCatSQL(cat_id) {
-        let sql = `SELECT count(*)as total FROM products where category=${cat_id}`;
+        let sql = `SELECT count(*) as total FROM products where category=${cat_id}`;
+        return sql;
+    }
+    updateProductByIdSQL(id) {
+        let sql = `update products set  name='${this.prod_name}',description='${this.description}',category=${this.category},image='${this.image}',sellingPrice=${this.sellingPrice},buyingPrice=${this.buyingPrice},taxRate=${this.taxRate},quantity=${this.quantity},salesUnit=${this.salesUnit},updated_at='${this.updated_at}' where id=${id}`;
         return sql;
     }    
 }
