@@ -99,22 +99,29 @@ router.post("/delete", (req, res, next) => {
     });   
 });
 
-router.get("/:productId", (req, res, next) => {
-    let pid = req.params.productId;
-
-    db.query(Product.getProductByIdSQL(pid), (err, data) => {
+router.post("/:id", (req, res, next) => {    
+    let id = _.get(req, 'params.id'); 
+    db.query(Product.getProductByIdSQL(id), (err, data) => {
         if (!err) {
             if (data && data.length > 0) {
-
+                let product = data[0];
+                const buffer = new Buffer.from(product.image);
+                const bufferBase64 = buffer.toString('utf-8');
+                product.image = bufferBase64;
                 res.status(200).json({
-                    message: "Product found.",
-                    product: data
+                    statusCode: '0000',                    
+                    product: product
                 });
             } else {
                 res.status(200).json({
+                    statusCode: '404',
                     message: "Product Not found."
                 });
             }
+        }else{
+            res.status(400).json({
+                message: "Bad request"
+            });
         }
     });
 });

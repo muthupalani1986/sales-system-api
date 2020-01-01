@@ -21,13 +21,13 @@ class Product {
         return sql;           
     }
 
-    static getProductByIdSQL(prd_id) {
-        let sql = `SELECT * FROM products WHERE id = ${prd_id}`;
+    static getProductByIdSQL(prod_id) {
+        let sql = `SELECT prod.*,cat.category_name,saunit.name as unit_name FROM products prod INNER JOIN category cat on prod.category=cat.id INNER JOIN sales_unit saunit on prod.salesUnit=saunit.id where prod.id=${prod_id} order by prod.name asc`;
         return sql;           
     }
 
-    static deleteProductByIdSQL(prd_id) {
-        let sql = `DELETE FROM products WHERE id = ${prd_id}`;
+    static deleteProductByIdSQL(prod_id) {
+        let sql = `DELETE FROM products WHERE id = ${prod_id}`;
         return sql;           
     }
 
