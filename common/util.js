@@ -35,5 +35,11 @@ class Util {
         productDetails.created_at = productDetails.updated_at = moment().format("YYYY-MM-DD HH:mm:ss");
         return productDetails;
     }
+    static getCustomerDetails(req) {
+        const customerDetails = {};
+        customerDetails.name = _.get(req, 'body.name');
+        customerDetails.created_at = customerDetails.updated_at = moment().format("YYYY-MM-DD HH:mm:ss");
+        return customerDetails;
+    }
 }
 export default Util;
