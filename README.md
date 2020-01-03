@@ -1,2 +1,6 @@
-#Ivoice api
-To start the server run npm start
+### Installation
+```sh
+$ cd invoice-api
+$ npm install
+$ npm start
+```
