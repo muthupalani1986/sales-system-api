@@ -38,6 +38,14 @@ class Util {
     static getCustomerDetails(req) {
         const customerDetails = {};
         customerDetails.name = _.get(req, 'body.name');
+        customerDetails.company_name = _.get(req, 'body.company_name','');
+        customerDetails.email = _.get(req, 'body.email','');
+        customerDetails.phone_number = _.get(req, 'body.phone_number','');
+        customerDetails.address = _.get(req, 'body.address','');
+        customerDetails.city = _.get(req, 'body.city','');
+        customerDetails.state = _.get(req, 'body.state', '');
+        customerDetails.postal_code = _.get(req, 'body.postal_code','');
+        customerDetails.country = _.get(req, 'body.country','');
         customerDetails.created_at = customerDetails.updated_at = moment().format("YYYY-MM-DD HH:mm:ss");
         return customerDetails;
     }

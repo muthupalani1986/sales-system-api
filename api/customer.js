@@ -26,7 +26,7 @@ router.post("/", passport.authenticate('jwt', { session: false }), (req, res, ne
 });
 router.post("/new", passport.authenticate('jwt', { session: false }), (req, res, next) => {
   const customerDetails = Util.getCustomerDetails(req);
-  const customerInstance = new Customer(customerDetails.name, customerDetails.created_at, customerDetails.updated_at);
+  const customerInstance = new Customer(customerDetails.name, customerDetails.company_name, customerDetails.email, customerDetails.phone_number, customerDetails.address, customerDetails.city,customerDetails.state, customerDetails.postal_code, customerDetails.country, customerDetails.created_at, customerDetails.updated_at);
   db.query(customerInstance.addCustomerSQL(), (err, data) => {
     if (!err) {    
          res.status(200).json({
@@ -71,9 +71,9 @@ router.post("/delete", passport.authenticate('jwt', { session: false }), (req, r
 
 router.post("/update", passport.authenticate('jwt', { session: false }), (req, res, next) => {
   const customerDetails=Util.getCustomerDetails(req);
-  const customerInstannce = new Customer(customerDetails.name, customerDetails.created_at, customerDetails.updated_at);
+  const customerInstance = new Customer(customerDetails.name, customerDetails.company_name, customerDetails.email, customerDetails.phone_number, customerDetails.address, customerDetails.city, customerDetails.state, customerDetails.postal_code, customerDetails.country, customerDetails.created_at, customerDetails.updated_at);
   const id = _.get(req, 'body.id');    
-  db.query(customerInstannce.updateCustomerByIdSQL(id), (err, data) => {    
+  db.query(customerInstance.updateCustomerByIdSQL(id), (err, data) => {    
     if (!err) {
       res.status(200).json({
         statusCode: '0000',
