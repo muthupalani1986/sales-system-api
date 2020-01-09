@@ -1,13 +1,13 @@
 import mysql from "mysql";
 
 const pool = mysql.createPool({
-            connectionLimit : 10,
-            host     : 'localhost',
-            user     : 'veyoga_invoice',
-            password : 'qhiApJHyY@6&49DGCW',
-            database : 'veyoga_invoice_system',
-            debug    : false 
-            });                    
+    connectionLimit: 10,
+    host: 'localhost',
+    user: 'veyoga_invoice',
+    password: 'qhiApJHyY@6&49DGCW',
+    database: 'veyoga_invoice_system',
+    debug: false
+});                         
 
 function executeQuery(sql, callback) {
     pool.getConnection((err,connection) => {        
@@ -32,8 +32,7 @@ function executeBulkInsertQuery(sql, data, callback) {
         if (err) {
             return callback(err, null);
         } else {
-            if (connection) {
-                console.log("Test", sql);
+            if (connection) {                
                 connection.query(sql, [data], function(error, results, fields) {
                     connection.release();
                     if (error) {

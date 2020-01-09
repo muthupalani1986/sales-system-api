@@ -112,7 +112,7 @@ router.post("/new", passport.authenticate('jwt', { session: false }), async (req
       message: "Bad request"
     });
   });
-  
+
   res.status(200).json({
     statusCode: '0000',
     message: "Quotation added successfully.",
@@ -121,47 +121,155 @@ router.post("/new", passport.authenticate('jwt', { session: false }), async (req
 
 });
 
-router.post("/delete", passport.authenticate('jwt', { session: false }), (req, res, next) => {
-  const id = _.get(req, 'body.id');  
-  db.query(Customer.deleteCustomerByIdSQL(id), (err, data) => {
-    if (!err) {
-      if (data && data.affectedRows > 0) {
-        res.status(200).json({
-          statusCode: '0000',
-          message: `Customer deleted successfully.`,
-          affectedRows: data.affectedRows
-        });
-      } else {
-        res.status(200).json({
-          statusCode: '404',
-          message: "Customer Not found."
-        });
-      }
-    } else {
+router.post("/delete", passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+  const id = _.get(req, 'body.id'); 
+  async function deleteQuotation() {
+    return new Promise((resolve, reject) => {
+      db.query(Quotation.deleteQuotationByIdSQL(id), (err, data) => {
+        if (!err) {
+          if (data && data.affectedRows > 0) {
+            resolve('2000');
+          } else {
+            resolve('404');
+          }
+        } else {
+          reject();
+        }
+
+      });
+    });
+  }
+    const deleteQuotationStatus = await deleteQuotation().catch((err) => {
       res.status(400).json({
         message: "Bad request"
       });
-    }    
-    
+    });  
+
+  async function deleteOrders() {
+    return new Promise((resolve, reject) => {
+      db.query(Order.deleteOrdersByQuotationId(id), (err, data) => {
+        if (!err) {
+          if (data && data.affectedRows > 0) {
+            resolve('2000');
+          } else {
+            resolve('404');
+          }
+        } else {
+          reject();
+        }
+
+      });
+    });
+  }
+  const deleteOrderStatus = await deleteOrders().catch((err) => {
+    res.status(400).json({
+      message: "Bad request"
+    });
   });
+
+  if (deleteOrderStatus == '404' || deleteQuotationStatus=='404') {
+    res.status(200).json({
+      statusCode: '404',
+      message: "Quotation not found"
+    });
+  }else{
+    res.status(200).json({
+      statusCode: '0000',
+      message: `Quotation deleted successfully.`
+    });
+  }
+
 });
 
-router.post("/update", passport.authenticate('jwt', { session: false }), (req, res, next) => {
-  const customerDetails=Util.getCustomerDetails(req);
-  const customerInstance = new Customer(customerDetails.name, customerDetails.company_name, customerDetails.email, customerDetails.phone_number, customerDetails.address, customerDetails.city, customerDetails.state, customerDetails.postal_code, customerDetails.country, customerDetails.created_at, customerDetails.updated_at);
-  const id = _.get(req, 'body.id');    
-  db.query(customerInstance.updateCustomerByIdSQL(id), (err, data) => {    
-    if (!err) {
-      res.status(200).json({
-        statusCode: '0000',
-        message: "Customer updated successfully."
+router.post("/update", passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+  const id = _.get(req, 'body.id');
+  async function updateQuotation() {
+    return new Promise((resolve, reject) => {
+      const quotationDetails = Util.getQuotationDetails(req);
+      quotationDetails.inv_number = '';
+      const quotationInstance = new Quotation(quotationDetails.inv_number, quotationDetails.status, quotationDetails.note, quotationDetails.order_tax, quotationDetails.order_discount, quotationDetails.shipping_cost, quotationDetails.grand_total, quotationDetails.customer_id, quotationDetails.created_at, quotationDetails.updated_at);
+      db.query(quotationInstance.updateQuotationByIdSQL(id), (err, data) => {
+        if (!err) {
+          resolve('200');
+        } else {
+          reject();
+        }
       });
-    } else {
+    });
+  }
+
+  const updateQuotationStatus=await updateQuotation().catch((err) => {
+    
+    res.status(400).json({
+      message: "Bad request"
+    });
+  });
+
+  async function deleteOrders() {
+    return new Promise((resolve, reject) => {      
+      db.query(Order.deleteOrdersByQuotationId(id), (err, data) => {
+        if (!err) {
+          resolve('200');
+        } else {
+          reject();
+        }
+      });
+    });
+  }
+  let deleteOrderStatus;
+  if (updateQuotationStatus=='200'){
+    deleteOrderStatus=await deleteOrders().catch((err) => { 
       res.status(400).json({
         message: "Bad request"
       });
+    });
+  }
+
+
+  async function saveOrders() {
+    return new Promise((resolve, reject) => {
+      const columnValues = [];
+      const orders = _.get(req, 'body.orders', []);
+      _.forEach(orders, (orderDetails) => {
+        const order = [];
+        order.push(orderDetails.quotation_id);
+        order.push(orderDetails.product_id);
+        order.push(orderDetails.quantity);
+        order.push(orderDetails.unit_price);
+        order.push(orderDetails.discount);
+        order.push(orderDetails.tax);
+        order.push(orderDetails.total);
+        const timeStamp = moment().format("YYYY-MM-DD HH:mm:ss");
+        order.push(timeStamp);
+        order.push(timeStamp);
+        columnValues.push(order);
+      });
+      db.bulkInsert(Order.addOrderSQL(), columnValues, (err, data) => {
+        if (!err) {
+          resolve('200');
+        } else {
+          reject();
+        }
+      });
+    });
+  }
+
+
+  if (deleteOrderStatus=='200'){
+    const saveOrdersStatus=await saveOrders().catch((err) => {      
+      res.status(400).json({
+        message: "Bad request"
+      });
+    });
+    if (saveOrdersStatus=='200'){
+      res.status(200).json({
+        statusCode: '0000',
+        message: "Quotation updated successfully."
+      });
     }
-  });
+  }
+
+   
 });
 
 router.post("/:id", passport.authenticate('jwt', { session: false }), (req, res, next) => {

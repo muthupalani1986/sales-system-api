@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.7.27, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.28, for Linux (x86_64)
 --
 -- Host: localhost    Database: invoice_system
 -- ------------------------------------------------------
--- Server version	5.7.27-0ubuntu0.18.04.1
+-- Server version 5.7.28-0ubuntu0.18.04.4
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -78,6 +78,38 @@ INSERT INTO `customers` VALUES (1,'TCS','2020-01-05 23:53:22','2020-01-06 00:18:
 UNLOCK TABLES;
 
 --
+-- Table structure for table `orders`
+--
+
+DROP TABLE IF EXISTS `orders`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `orders` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `quotation_id` int(11) DEFAULT NULL,
+  `product_id` int(11) DEFAULT NULL,
+  `quantity` int(11) DEFAULT NULL,
+  `unit_price` decimal(10,2) DEFAULT '0.00',
+  `discount` decimal(10,2) DEFAULT '0.00',
+  `tax` decimal(10,2) DEFAULT '0.00',
+  `total` decimal(10,2) DEFAULT '0.00',
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `orders`
+--
+
+LOCK TABLES `orders` WRITE;
+/*!40000 ALTER TABLE `orders` DISABLE KEYS */;
+INSERT INTO `orders` VALUES (15,3,4,10,4500.00,0.00,0.00,3000.00,'2020-01-10 04:26:23','2020-01-10 04:26:23'),(16,3,5,10,5000.00,0.00,0.00,4000.00,'2020-01-10 04:26:23','2020-01-10 04:26:23');
+/*!40000 ALTER TABLE `orders` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `products`
 --
 
@@ -115,38 +147,6 @@ INSERT INTO `products` VALUES (4,'Braies Lake - Canvas Print','Duis anim est non
 UNLOCK TABLES;
 
 --
--- Table structure for table `quotation_products`
---
-
-DROP TABLE IF EXISTS `quotation_products`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `quotation_products` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `quotation_id` int(11) DEFAULT NULL,
-  `product_id` int(11) DEFAULT NULL,
-  `quantity` int(11) DEFAULT NULL,
-  `unit_price` decimal(10,2) DEFAULT '0.00',
-  `discount` decimal(10,2) DEFAULT '0.00',
-  `tax` decimal(10,2) DEFAULT '0.00',
-  `total` decimal(10,2) DEFAULT '0.00',
-  `created_at` datetime NOT NULL,
-  `updated_at` datetime NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `quotation_products`
---
-
-LOCK TABLES `quotation_products` WRITE;
-/*!40000 ALTER TABLE `quotation_products` DISABLE KEYS */;
-INSERT INTO `quotation_products` VALUES (1,1,1,1,3000.00,0.00,0.00,3000.00,'2020-01-08 10:00:00','2020-01-08 10:00:00');
-/*!40000 ALTER TABLE `quotation_products` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `quotations`
 --
 
@@ -155,15 +155,19 @@ DROP TABLE IF EXISTS `quotations`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `quotations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `inv_number` varchar(45) NOT NULL,
   `status` int(11) NOT NULL,
   `note` varchar(45) DEFAULT NULL,
   `order_discount` decimal(10,2) DEFAULT '0.00',
   `shipping_cost` decimal(10,2) DEFAULT '0.00',
   `grand_total` decimal(10,2) DEFAULT '0.00',
+  `customer_id` int(11) NOT NULL,
+  `order_tax` decimal(10,2) DEFAULT '0.00',
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `inv_number_UNIQUE` (`inv_number`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -172,7 +176,7 @@ CREATE TABLE `quotations` (
 
 LOCK TABLES `quotations` WRITE;
 /*!40000 ALTER TABLE `quotations` DISABLE KEYS */;
-INSERT INTO `quotations` VALUES (1,1,'test',0.00,0.00,300.00,'2020-01-08 10:00:00','2020-01-08 10:00:00');
+INSERT INTO `quotations` VALUES (3,'INV-001',1,'Test edited',0.00,0.00,4000.00,1,0.00,'2020-01-10 04:02:27','2020-01-10 04:26:22');
 /*!40000 ALTER TABLE `quotations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -266,4 +270,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-01-08 23:51:54
+-- Dump completed on 2020-01-10  4:26:55

@@ -28,7 +28,7 @@ class Quotation {
         return sql;           
     }
     updateQuotationByIdSQL(id) {
-        let sql = `update quotations set status=${this.status},notes='${this.note}',order_tax=${this.order_tax},order_discount=${this.order_discount},shipping_cost=${this.shipping_cost},grand_total=${this.grand_total},customer_id=${this.customer_id}, updated_at='${this.updated_at}' WHERE id = ${id}`;
+        let sql = `update quotations set status=${this.status},note='${this.note}',order_tax=${this.order_tax},order_discount=${this.order_discount},shipping_cost=${this.shipping_cost},grand_total=${this.grand_total},customer_id=${this.customer_id}, updated_at='${this.updated_at}' WHERE id = ${id}`;
         return sql;           
     }
     static getAllQuotationSQL() {

@@ -13,8 +13,16 @@ class Order {
     }
 
     static addOrderSQL() {
-        var sql = "INSERT INTO orders (quotation_id, product_id, quantity, unit_price, discount, tax,total,created_at, updated_at) VALUES ?";
+        const sql = "INSERT INTO orders (quotation_id, product_id, quantity, unit_price, discount, tax,total,created_at, updated_at) VALUES ?";
         return sql;           
+    }
+    static getOrdersByQuotationId(quotation_id){
+        const sql = `SELECT ord.*,prod.name,prod.code from orders ord INNER JOIN products prod on prod.id=ord.product_id WHERE quotation_id=${quotation_id}`;
+        return sql;
+    }
+    static deleteOrdersByQuotationId(quotation_id) {
+        const sql = `DELETE from orders where quotation_id=${quotation_id}`;
+        return sql;
     }   
 }
 
