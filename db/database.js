@@ -3,9 +3,9 @@ import mysql from "mysql";
 const pool = mysql.createPool({
             connectionLimit : 10,
             host     : 'localhost',
-            user     : 'root',
-            password : 'password',
-            database : 'invoice_system',
+            user     : 'veyoga_invoice',
+            password : 'qhiApJHyY@6&49DGCW',
+            database : 'veyoga_invoice_system',
             debug    : false 
             });                    
 
