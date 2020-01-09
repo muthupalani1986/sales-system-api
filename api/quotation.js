@@ -272,21 +272,54 @@ router.post("/update", passport.authenticate('jwt', { session: false }), async (
    
 });
 
-router.post("/:id", passport.authenticate('jwt', { session: false }), (req, res, next) => {
-  let id = _.get(req, 'params.id');   
-  db.query(Customer.getCustomerByIdSQL(id), (err, data) => {    
-    if (!err) {
-      if (data && data.length==0){
-        res.status(200).json({ statusCode: '404', message: "Product not found" });
-      }else{
-        res.status(200).json({ statusCode: '0000', customer: data[0] });
-      }    
-    } else {
-      res.status(400).json({
-        message: "Bad request"
+router.post("/:id", passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+  let id = _.get(req, 'params.id'); 
+
+  async function getQuotation() {
+    return new Promise((resolve, reject) => {
+      const sql = Quotation.getQuotationByIdSQL(id);
+      console.log("sql", sql);
+      db.query(Quotation.getQuotationByIdSQL(id), (err, data) => {
+        if (!err) {
+          const response = Object.assign({}, data[0]);
+          resolve(response);
+        } else {
+          reject();
+        }
       });
-    }
+    });
+  }
+
+  const getQuotationDetails = await getQuotation().catch((err) => {
+    res.status(400).json({
+      message: "Bad request"
+    });
   });
+
+  async function getOrder() {
+    return new Promise((resolve, reject) => {
+      db.query(Order.getOrdersByQuotationId(id), (err, data) => {
+        if (!err) {
+          resolve(data);
+        } else {
+          reject();
+        }
+      });
+    });
+  }
+
+  const getOrderDetails = await getOrder().catch((err) => {
+    res.status(400).json({
+      message: "Bad request"
+    });
+  });
+  if (getQuotationDetails && getOrderDetails){
+    const response={
+      quotationDetails: getQuotationDetails,
+      orderDetails: getOrderDetails
+    }
+    res.status(200).json(response);
+  }
 });
 
 module.exports = router;
