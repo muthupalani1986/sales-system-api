@@ -27,6 +27,24 @@ function executeQuery(sql, callback) {
         }
     });
 }
+function executeBulkInsertQuery(sql, data, callback) {
+    pool.getConnection((err, connection) => {
+        if (err) {
+            return callback(err, null);
+        } else {
+            if (connection) {
+                console.log("Test", sql);
+                connection.query(sql, [data], function(error, results, fields) {
+                    connection.release();
+                    if (error) {
+                        return callback(error, null);
+                    }
+                    return callback(null, results);
+                });
+            }
+        }
+    });
+}
 
 function query(sql, callback) {    
     executeQuery(sql,function(err, data) {
@@ -37,4 +55,12 @@ function query(sql, callback) {
     });
 }
 
-module.exports = {query:query};
+function bulkInsert(sql, data,callback) {
+    executeBulkInsertQuery(sql, data, function(err, data) {
+        if (err) {
+            return callback(err);
+        }
+        callback(null, data);
+    });
+}
+module.exports = { query: query, bulkInsert: bulkInsert};

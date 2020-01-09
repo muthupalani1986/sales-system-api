@@ -49,5 +49,48 @@ class Util {
         customerDetails.created_at = customerDetails.updated_at = moment().format("YYYY-MM-DD HH:mm:ss");
         return customerDetails;
     }
+    static getQuotationDetails(req) {
+        const quotationDetails = {};
+        quotationDetails.status = _.get(req, 'body.status');
+        quotationDetails.note = _.get(req, 'body.note');
+        quotationDetails.order_tax = _.get(req, 'body.order_tax',0.00);
+        quotationDetails.order_discount = _.get(req, 'body.order_discount',0.00);
+        quotationDetails.shipping_cost = _.get(req, 'body.shipping_cost',0.00);
+        quotationDetails.grand_total = _.get(req, 'body.grand_total',0.00);
+        quotationDetails.customer_id = _.get(req, 'body.customer_id',0);
+        quotationDetails.created_at = quotationDetails.updated_at = moment().format("YYYY-MM-DD HH:mm:ss");
+        return quotationDetails;
+    }
+    static nextInvNumber(invoiceNumber) {
+        if (!invoiceNumber) throw new Error('invoiceNumber cannot be empty')
+        var array = invoiceNumber.split(/[_/:\-;\\]+/)
+        var lastSegment = array.pop()
+        var priorSegment = invoiceNumber.substr(0, invoiceNumber.indexOf(lastSegment))
+           var nextNumber = Util.alphaNumericIncrementer(lastSegment)
+        return priorSegment + nextNumber;
+    }
+
+    static  alphaNumericIncrementer(str) {
+        if (str && str.length > 0) {
+            var invNum = str.replace(/([^a-z0-9]+)/gi, '')
+            invNum = invNum.toUpperCase()
+            var index = invNum.length - 1
+            while (index >= 0) {
+                if (invNum.substr(index, 1) === '9') {
+                    invNum = invNum.substr(0, index) + '0' + invNum.substr(index + 1)
+                } else if (invNum.substr(index, 1) === 'Z') {
+                    invNum = invNum.substr(0, index) + 'A' + invNum.substr(index + 1)
+                } else {
+                    var char = String.fromCharCode(invNum.charCodeAt(index) + 1)
+                    invNum = invNum.substr(0, index) + char + invNum.substr(index + 1)
+                    index = 0
+                }
+                index--
+            }
+            return invNum
+        } else {
+            throw new Error('str cannot be empty')
+        }
+    }
 }
 export default Util;
