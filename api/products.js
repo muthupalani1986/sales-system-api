@@ -6,12 +6,15 @@ const passport = require('passport');
 var _ = require('lodash');
 const router = express.Router();
 router.post("/", passport.authenticate('jwt', { session: false }), (req, res, next) => {    
-     db.query(Product.getAllProductSQL(), (err, data)=> {
+    const prodLookup = _.get(req, 'body.prodLookup', false);
+    db.query(Product.getAllProductSQL(prodLookup), (err, data) => {
         if(!err) {
             const products=_.map(data,(product)=>{
-                const buffer = new Buffer.from(product.image);
-                const bufferBase64 = buffer.toString('utf-8');
-                product.image = bufferBase64;
+                if (!prodLookup) {
+                    const buffer = new Buffer.from(product.image);
+                    const bufferBase64 = buffer.toString('utf-8');
+                    product.image = bufferBase64;
+                }
                 return product;
             });
             res.status(200).json({

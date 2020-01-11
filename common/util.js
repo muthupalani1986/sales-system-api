@@ -1,5 +1,7 @@
 var _ = require('lodash');
+import db from "../db/database";
 const moment = require('moment');
+import Order from "../queries/order";
 class Util {
     constructor() {
 
@@ -282,6 +284,17 @@ class Util {
                 780,
                 { align: "center", width: 500 }
             );
+    }
+    static getOrder(quotation_id) {
+        return new Promise((resolve, reject) => {
+            db.query(Order.getOrdersByQuotationId(quotation_id), (err, data) => {
+                if (!err && data && data.length > 0) {
+                    resolve(data);
+                } else {
+                    reject(err);
+                }
+            });
+        });
     }
 }
 export default Util;

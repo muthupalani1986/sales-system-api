@@ -12,13 +12,31 @@ const moment = require('moment');
 import Util from "../common/util";
 const PDFDocument = require('pdfkit');
 
-router.post("/", passport.authenticate('jwt', { session: false }), (req, res, next) => {  
-  db.query(Quotation.getAllQuotationSQL(), (err, data) => {
+router.post("/", passport.authenticate('jwt', { session: false }), async (req, res, next) => {  
+  db.query(Quotation.getAllQuotationSQL(), async (err, data) => {
     if (!err) {
-      res.status(200).json({
-      statusCode: '0000',
-      quotations: data
+      
+      const functionWithPromise = async item => { //a function that returns a promise
+        const orders=await Util.getOrder(item.id);
+        item['orders'] = orders;
+        return Promise.resolve(item)
+      }
+
+      const anAsyncFunction = async item => {
+        return functionWithPromise(item)
+      }
+
+      const getQuotations = async () => {
+        return Promise.all(data.map(item => anAsyncFunction(item)))
+      }
+
+      getQuotations().then(data => {
+        res.status(200).json({
+          statusCode: '0000',
+          quotations: data
+        });
       });
+
     } else {
       res.status(400).json({
         message: "Bad request"
