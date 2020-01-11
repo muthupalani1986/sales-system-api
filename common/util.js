@@ -51,12 +51,10 @@ class Util {
     }
     static getQuotationDetails(req) {
         const quotationDetails = {};
-        quotationDetails.status = _.get(req, 'body.status');
         quotationDetails.note = _.get(req, 'body.note');
         quotationDetails.order_tax = _.get(req, 'body.order_tax',0.00);
         quotationDetails.order_discount = _.get(req, 'body.order_discount',0.00);
         quotationDetails.shipping_cost = _.get(req, 'body.shipping_cost',0.00);
-        quotationDetails.grand_total = _.get(req, 'body.grand_total',0.00);
         quotationDetails.customer_id = _.get(req, 'body.customer_id',0);
         quotationDetails.created_at = quotationDetails.updated_at = moment().format("YYYY-MM-DD HH:mm:ss");
         return quotationDetails;
@@ -108,10 +106,13 @@ class Util {
             .moveDown();
     }
     static generateCustomerInformation(doc, invoice) {
+        const invoice_title = invoice.status == 2 ? 'Invoice' : 'Quotation';
+        const billTitle = invoice.status == 2 ? 'Invoice Number:' : 'Quotation Number:'
+        const billDateTitle = invoice.status == 2 ? 'Invoice Date:' : 'Quotation Date:'
         doc
             .fillColor("#444444")
             .fontSize(20)
-            .text("Invoice", 50, 160);
+            .text(invoice_title, 50, 160);
 
         Util.generateHr(doc, 185);
 
@@ -119,11 +120,11 @@ class Util {
 
         doc
             .fontSize(10)
-            .text("Invoice Number:", 50, customerInformationTop)
+            .text(billTitle, 50, customerInformationTop)
             .font("Helvetica-Bold")
             .text(invoice.invoice_nr, 150, customerInformationTop)
             .font("Helvetica")
-            .text("Invoice Date:", 50, customerInformationTop + 15)
+            .text(billDateTitle, 50, customerInformationTop + 15)
             .text(Util.formatDate(invoice.invoice_date), 150, customerInformationTop + 15)           
             .font("Helvetica-Bold")
             .text(invoice.shipping.name, 300, customerInformationTop)
@@ -169,7 +170,7 @@ class Util {
             "Item",
             "Unit Cost",
             "Quantity",
-            "%Tax",
+            "Tax",
             "Discount",
             "Line Total"
         );
@@ -179,15 +180,12 @@ class Util {
         for (i = 0; i < invoice.items.length; i++) {
             const item = invoice.items[i];
             const position = invoiceTableTop + (i + 1) * 30;
-            const amount = (item.unit_price * item.quantity);            
-            let tax = 0;
-            const isValidNumber=isFinite(amount / item.tax);
-            if (isValidNumber) {
-               tax = +((amount*item.tax) / 100);
-            }            
-            const itemTotal = ((amount + tax) - item.discount);
-            const lineTotal = itemTotal.toFixed(2);
-            
+            const amount = +(item.unit_price * item.quantity);    
+            const disCountAmount = +((amount * item.discount) / 100);
+            const taxableAmount = +(amount - disCountAmount);       
+            const tax = +((taxableAmount * item.tax) / 100);
+            const itemTotal = (taxableAmount+tax);
+            const lineTotal = itemTotal.toFixed(2);            
             itemsTotal = itemsTotal + itemTotal;
             Util.generateTableRow(
                 doc,
@@ -195,8 +193,8 @@ class Util {
                 item.name,
                 Util.formatCurrency(item.unit_price),
                 item.quantity,
-                item.tax,
-                item.discount,
+                item.tax+'%',
+                item.discount+'%',
                 Util.formatCurrency(lineTotal)
             );
             Util.generateHr(doc, position + 20);
@@ -211,7 +209,7 @@ class Util {
             "",
             "",
             "Order Discount",
-            Util.formatCurrency(invoice.order_discount.toFixed(2))
+            invoice.order_discount.toFixed(2)+'%'
         );
 
         const paidToDatePosition = subtotalPosition + 20;
@@ -235,15 +233,13 @@ class Util {
             "",
             "",
             "Order Tax",
-            Util.formatCurrency(invoice.order_tax.toFixed(2))
+            invoice.order_tax.toFixed(2)+'%'
         );
-        const totalPosition = duePosition + 20;
-        let orderTax = 0;
-        const isValidNumber = isFinite(itemsTotal / invoice.order_tax);
-        if (isValidNumber) {
-            orderTax = +((itemsTotal / invoice.order_tax) / 100);
-        }
-        const grandTotal = ((itemsTotal + orderTax + invoice.shipping_cost) - invoice.order_discount).toFixed(2);
+        const totalPosition = duePosition + 20;        
+        const orderDisCountAmount = +((itemsTotal * invoice.order_discount) / 100);
+        const orderTaxableAmount = +((itemsTotal + invoice.shipping_cost) - orderDisCountAmount);
+        const orderTax = +((orderTaxableAmount * invoice.order_tax) / 100);
+        const grandTotal = +(orderTaxableAmount + orderTax).toFixed(2);        
         doc.font("Helvetica-Bold");
         Util.generateTableRow(
             doc,

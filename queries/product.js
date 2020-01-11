@@ -42,6 +42,10 @@ class Product {
     updateProductByIdSQL(id) {
         let sql = `update products set  name='${this.prod_name}',description='${this.description}',category=${this.category},image='${this.image}',sellingPrice=${this.sellingPrice},buyingPrice=${this.buyingPrice},taxRate=${this.taxRate},quantity=${this.quantity},salesUnit=${this.salesUnit},updated_at='${this.updated_at}' where id=${id}`;
         return sql;
+    }
+    static updateStockByProdIdSQL(product_id,number_of_items){
+        const sql = `update products set quantity = quantity - ${number_of_items} where id = ${product_id}`;        
+        return sql;
     }    
 }
 
