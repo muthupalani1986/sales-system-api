@@ -9,6 +9,8 @@ const passport = require('passport');
 var _ = require('lodash');
 const moment = require('moment');
 import Util from "../common/util";
+const PDFDocument = require('pdfkit');
+
 router.post("/", passport.authenticate('jwt', { session: false }), (req, res, next) => {  
   db.query(Quotation.getAllQuotationSQL(), (err, data) => {
     if (!err) {
@@ -276,9 +278,7 @@ router.post("/:id", passport.authenticate('jwt', { session: false }), async (req
   let id = _.get(req, 'params.id'); 
 
   async function getQuotation() {
-    return new Promise((resolve, reject) => {
-      const sql = Quotation.getQuotationByIdSQL(id);
-      console.log("sql", sql);
+    return new Promise((resolve, reject) => {      
       db.query(Quotation.getQuotationByIdSQL(id), (err, data) => {
         if (!err) {
           const response = Object.assign({}, data[0]);
@@ -320,6 +320,88 @@ router.post("/:id", passport.authenticate('jwt', { session: false }), async (req
     }
     res.status(200).json(response);
   }
+});
+
+router.post("/generate-invoice/:id", passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+  let id = _.get(req, 'params.id'); 
+  const invoice = {
+    company_details: config.company_details,
+    shipping: {
+      name: "",
+      address: "",
+      city: "",
+      state: "",
+      country: "",
+      postal_code:""
+    },    
+    subtotal: 8000,
+    paid: 0,
+    invoice_nr:'',
+    invoice_date:'',
+    order_discount:0,
+    shipping_cost:0,
+    order_tax:0
+  };
+
+  async function getQuotation() {
+    return new Promise((resolve, reject) => {
+      db.query(Quotation.getQuotationByIdSQL(id), (err, data) => {
+        if (!err) {
+          const response = Object.assign({}, data[0]);
+          resolve(response);
+        } else {
+          reject();
+        }
+      });
+    });
+  }
+
+  const getQuotationDetails = await getQuotation().catch((err) => {
+    res.status(400).json({
+      message: "Bad request"
+    });
+  });
+
+  async function getOrder() {
+    return new Promise((resolve, reject) => {
+      db.query(Order.getOrdersByQuotationId(id), (err, data) => {
+        if (!err) {
+          resolve(data);
+        } else {
+          reject();
+        }
+      });
+    });
+  }
+
+  const getOrderDetails = await getOrder().catch((err) => {
+    res.status(400).json({
+      message: "Bad request"
+    });
+  });
+  
+  invoice.shipping.name = getQuotationDetails.name;
+  invoice.shipping.address = getQuotationDetails.address.replace(/(\r\n|\n|\r)/gm, ", ");;
+  invoice.shipping.city = getQuotationDetails.city;
+  invoice.shipping.state = getQuotationDetails.state;
+  invoice.shipping.country = getQuotationDetails.country;
+  invoice.invoice_nr = getQuotationDetails.inv_number;
+  invoice.invoice_date = getQuotationDetails.created_at;
+  invoice.order_discount = getQuotationDetails.order_discount;
+  invoice.shipping_cost = getQuotationDetails.shipping_cost;
+  invoice.order_tax = getQuotationDetails.order_tax;
+  invoice.items = getOrderDetails;    
+  const doc = new PDFDocument();
+  let filename = getQuotationDetails.inv_number;
+  filename = encodeURIComponent(filename) + '.pdf'
+  res.setHeader('Content-disposition', 'attachment; filename="' + filename + '"')
+  res.setHeader('Content-type', 'application/pdf');  
+  Util.generateHeader(doc, invoice);  
+  Util.generateCustomerInformation(doc, invoice);
+  Util.generateInvoiceTable(doc, invoice);
+  //Util.generateFooter(doc);
+  doc.pipe(res)
+  doc.end()
 });
 
 module.exports = router;

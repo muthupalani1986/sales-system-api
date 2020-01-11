@@ -19,7 +19,7 @@ class Quotation {
         return sql;           
     }
     static getQuotationByIdSQL(id) {
-        const sql=`SELECT * from quotations where id = '${id}' limit 1`;
+        const sql = `SELECT quo.*, cus.name,cus.company_name,cus.address,cus.city,cus.state,cus.postal_code,cus.country from quotations quo INNER JOIN customers cus on cus.id=quo.customer_id where quo.id = '${id}' limit 1`;
         return sql;           
     }    
 
