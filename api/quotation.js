@@ -340,11 +340,10 @@ router.post("/:id", passport.authenticate('jwt', { session: false }), async (req
     res.status(400).json({
       message: "Bad request"
     });
-  }else{
-    const response = {
-      quotationDetails: getQuotationDetails,
-      orderDetails: getOrderDetails
-    }
+  }else{    
+    const response = {};
+    response.quotation = getQuotationDetails;
+    response.quotation.orders = getOrderDetails;
     res.status(200).json(response);
   }
 });

@@ -34,7 +34,7 @@ class Product {
     static getAllProductSQL(prodLookup) {
         let sql = `SELECT prod.*,cat.category_name,saunit.name as unit_name FROM products prod INNER JOIN category cat on prod.category=cat.id INNER JOIN sales_unit saunit on prod.salesUnit=saunit.id order by prod.name asc`;
         if (prodLookup){
-            sql = "SELECT prod.id,prod.name,prod.description,prod.taxRate,prod.quantity,prod.sellingPrice,prod.category,cat.category_name,saunit.name as unit_name FROM products prod INNER JOIN category cat on prod.category=cat.id INNER JOIN sales_unit saunit on prod.salesUnit=saunit.id order by prod.name asc";
+            sql = "SELECT prod.id,prod.name,prod.code,prod.description,prod.taxRate,prod.quantity,prod.sellingPrice,prod.category,cat.category_name,saunit.name as unit_name FROM products prod INNER JOIN category cat on prod.category=cat.id INNER JOIN sales_unit saunit on prod.salesUnit=saunit.id order by prod.name asc";
         }        
         return sql;           
     }
