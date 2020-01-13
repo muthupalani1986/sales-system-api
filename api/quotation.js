@@ -131,7 +131,8 @@ router.post("/new", passport.authenticate('jwt', { session: false }), async (req
     res.status(200).json({
       statusCode: '0000',
       message: "Quotation added successfully.",
-      id: newQuotationDetails.id
+      id: newQuotationDetails.id,
+      quotation_number: quotation_number
     });
   }else{
     res.status(400).json({
@@ -341,14 +342,16 @@ router.post("/:id", passport.authenticate('jwt', { session: false }), async (req
       message: "Bad request"
     });
   }else{    
-    const response = {};
+    const response = {
+    statusCode: '0000',
+    };    
     response.quotation = getQuotationDetails;
     response.quotation.orders = getOrderDetails;
     res.status(200).json(response);
   }
 });
 
-router.post("/generate-invoice/:id", passport.authenticate('jwt', { session: false }), async (req, res, next) => {
+router.post("/generate-invoice/:id", async (req, res, next) => {
   let id = _.get(req, 'params.id'); 
   const invoice = {
     company_details: config.company_details,
