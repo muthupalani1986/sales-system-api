@@ -351,7 +351,7 @@ router.post("/:id", passport.authenticate('jwt', { session: false }), async (req
   }
 });
 
-router.post("/generate-invoice/:id", async (req, res, next) => {
+router.get("/generate-invoice/:id",  async (req, res, next) => {
   let id = _.get(req, 'params.id'); 
   const invoice = {
     company_details: config.company_details,
@@ -548,7 +548,8 @@ router.post("/create-sales/:quotation_id", passport.authenticate('jwt', { sessio
       if (crateSalesStatus === '200') {
         res.status(200).json({
           statusCode: '0000',
-          message: "Invoice created successfully."
+          message: "Invoice created successfully.",
+          invoice_number: invoice_number
         });
       } else if (crateSalesStatus === '404') {
         res.status(200).json({
