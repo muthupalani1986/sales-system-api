@@ -35,8 +35,11 @@ class Quotation {
         return sql;           
     }
     static getLastQuotationSQL(status) {
-        const  quotationStatus = typeof status !== 'undefined' ? status : 1;
-        let sql = `SELECT * FROM quotations where status=${quotationStatus} order by id desc limit 1`;
+        const  quotationStatus = typeof status !== 'undefined' ? true : false;
+        let sql = `SELECT * FROM quotations where status=${status} order by id desc limit 1`;
+        if (!quotationStatus){
+            sql = `SELECT * FROM quotations order by id desc limit 1`;
+        }
         return sql;
     }
     static createSalesByQuotationId(quotation_id, inv_number) {
