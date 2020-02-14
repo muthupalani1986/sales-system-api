@@ -2,5 +2,6 @@
 ```sh
 $ cd invoice-api
 $ npm install
-$ npm start
+$ npm install pm2@latest -g
+$ pm2 start npm -- start
 ```
