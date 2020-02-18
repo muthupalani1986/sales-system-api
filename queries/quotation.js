@@ -30,8 +30,11 @@ class Quotation {
         let sql = `update quotations set note='${this.note}',order_tax=${this.order_tax},order_discount=${this.order_discount},shipping_cost=${this.shipping_cost},customer_id=${this.customer_id}, updated_at='${this.updated_at}' WHERE id = ${id}`;        
         return sql;           
     }
-    static getAllQuotationSQL() {
+    static getAllQuotationSQL(type) {
         let sql = `SELECT * FROM quotations order by updated_at desc`;
+		if (type==='sales'){
+			sql = `SELECT * FROM quotations where status=2 order by updated_at desc`;
+		}
         return sql;           
     }
     static getLastQuotationSQL(status) {

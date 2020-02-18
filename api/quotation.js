@@ -13,7 +13,8 @@ import Util from "../common/util";
 const PDFDocument = require('pdfkit');
 
 router.post("/", passport.authenticate('jwt', { session: false }), async (req, res, next) => {  
-  db.query(Quotation.getAllQuotationSQL(), async (err, data) => {
+	const type = _.get(req, 'body.type');
+	db.query(Quotation.getAllQuotationSQL(type), async (err, data) => {
     if (!err) {
       
       const functionWithPromise = async item => { //a function that returns a promise
