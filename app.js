@@ -3,6 +3,8 @@ import bodyparser from "body-parser";
 import cors from "cors";
 import products from "./api/products";
 import orders from "./api/orders";
+import payment from "./api/payment";
+import pickup from "./api/pickup";
 import users from "./api/users";
 import category from "./api/category";
 import customer from "./api/customer";
@@ -52,6 +54,8 @@ app.use("/user",users);
 app.use("/category", category);
 app.use("/customer", customer);
 app.use("/quotation", quotation);
+app.use("/payment", payment);
+app.use("/pickup", pickup);
 //if we are here then the specified request is not found
 app.use((req,res,next)=> {
     const err = new Error("Not Found");
